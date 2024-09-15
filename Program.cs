@@ -5,19 +5,19 @@ using System.Text.Json;
 
 public class FATEntry
 {
-    public string FileName { get; set; } = string.Empty; // Propiedad no anulable inicializada
-    public string InitialDataFile { get; set; } = string.Empty; // Propiedad no anulable inicializada
+    public string FileName { get; set; } = string.Empty; 
+    public string InitialDataFile { get; set; } = string.Empty; 
     public bool IsInRecycleBin { get; set; } = false;
     public int TotalCharacters { get; set; }
     public DateTime CreationDate { get; set; } = DateTime.Now;
     public DateTime ModificationDate { get; set; } = DateTime.Now;
-    public DateTime? DeletionDate { get; set; } // Permitimos valores nulos para la fecha de eliminación
+    public DateTime? DeletionDate { get; set; } 
 }
 
 public class DataFile
 {
-    public string Data { get; set; } = string.Empty; // Propiedad no anulable inicializada
-    public string? NextDataFile { get; set; } // Nullable, ya que puede ser null
+    public string Data { get; set; } = string.Empty; 
+    public string? NextDataFile { get; set; } 
     public bool Eof { get; set; }
 }
 
@@ -73,7 +73,7 @@ class Program
     static void CreateFile()
     {
         Console.Write("Ingrese el nombre del archivo: ");
-        string fileName = Console.ReadLine() ?? string.Empty; // Usamos null-coalescing para evitar nulos
+        string fileName = Console.ReadLine() ?? string.Empty; 
         Console.Write("Ingrese los datos a almacenar: ");
         string data = Console.ReadLine() ?? string.Empty;
 
@@ -83,7 +83,7 @@ class Program
             return;
         }
 
-        // Crear la tabla FAT
+       
         FATEntry fatEntry = new FATEntry
         {
             FileName = fileName,
@@ -95,7 +95,7 @@ class Program
         List<string> dataFiles = new List<string>();
         int index = 0;
 
-        // Segmentar los datos en porciones de 20 caracteres
+    
         while (index < data.Length)
         {
             DataFile dataFile = new DataFile
@@ -109,7 +109,7 @@ class Program
 
             if (dataFiles.Count > 0)
             {
-                // Actualizar el archivo de datos anterior con la ruta del siguiente
+               
                 var previousFileData = JsonSerializer.Deserialize<DataFile>(File.ReadAllText(dataFiles[^1]))!;
                 previousFileData.NextDataFile = dataFilePath;
                 File.WriteAllText(dataFiles[^1], JsonSerializer.Serialize(previousFileData));
@@ -120,7 +120,7 @@ class Program
             index += 20;
         }
 
-        // Guardar el primer archivo en la tabla FAT
+    
         fatEntry.InitialDataFile = dataFiles[0];
         string fatFilePath = Path.Combine(directory, fileName + "_FAT.json");
         File.WriteAllText(fatFilePath, JsonSerializer.Serialize(fatEntry));
@@ -157,7 +157,7 @@ class Program
             {
                 Console.WriteLine($"Nombre: {fatEntry.FileName}, Tamaño: {fatEntry.TotalCharacters}, Creación: {fatEntry.CreationDate}, Modificación: {fatEntry.ModificationDate}");
 
-                // Leer el contenido completo del archivo
+            
                 string dataFilePath = fatEntry.InitialDataFile;
                 while (dataFilePath != null)
                 {
@@ -196,7 +196,7 @@ class Program
                     dataFilePath = nextFile;
                 }
 
-                // Solicitar nuevos datos
+             
                 Console.Write("Ingrese los nuevos datos: ");
                 string newContent = Console.ReadLine() ?? string.Empty;
 
@@ -206,7 +206,7 @@ class Program
                     return;
                 }
 
-                // Crear nuevos archivos de datos y actualizar FAT
+              
                 List<string> dataFiles = new List<string>();
                 int index = 0;
 
@@ -233,7 +233,7 @@ class Program
                     index += 20;
                 }
 
-                // Actualizar FAT
+                
                 fatEntry.InitialDataFile = dataFiles[0];
                 fatEntry.TotalCharacters = newContent.Length;
                 fatEntry.ModificationDate = DateTime.Now;
